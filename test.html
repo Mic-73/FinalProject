@@ -1,21 +1,22 @@
-
+<!DOCTYPE html>
 <html>
-<body>
-<form name="form1"
-      action="show.php"
-      method=get>
+<body style="font-family:arial">
 
-    <tr>
-        <td>
-            Search: <br>
-            <input type=text name=txbox value="">
-        </td>
+<h3 style="color:Tomato">Search Consoles</h3>
 
-        <td align="center">
+<FORM NAME="search"
+         ACTION="http://localhost:3000/test"
+         METHOD="post">
 
-            <input type=submit size="60" value="Search">
-        </td>
-    </tr>
-</form>
+         <br><br>
+         Console's Manufacturer:
+         <INPUT TYPE="TEXT" NAME="desc" VALUE=" " > <br>
+
+         <br><br>
+         <INPUT TYPE="submit" VALUE="Search">
+   </FORM>
+
+
 </body>
 </html>
+
