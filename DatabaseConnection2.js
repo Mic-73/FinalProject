@@ -55,7 +55,7 @@ function readAndServe(path, res)
 //*** receive the main page get requests from the client
 //******************************************************************************
 app.get("/test", function (req, res) {
-    readAndServe("./test.html",res)
+    readAndServe("./menu.html",res)
 
 });
 
