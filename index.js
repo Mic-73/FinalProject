@@ -8,12 +8,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const mysql = require('mysql');
 const fs = require("fs");
 
-// Database connection setup
+// Database connection setup, do not save actual database info here
 var con = mysql.createConnection({
-  host: "35.232.159.218",
-  user: "root",
-  password: "Queries42$",
-  database: "game_stock"
+  host: "--",
+  user: "--",
+  password: "--",
+  database: "--"
 });
 
 con.connect(function(err) {
