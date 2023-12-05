@@ -26,7 +26,7 @@ const con = mysql.createConnection({
     host: "--",
   user: "--",
   password: "--",
-  database: "--
+  database: "--"
 });
 
 // Connect to the database
