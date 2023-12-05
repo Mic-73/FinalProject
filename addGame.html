@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<FORM NAME="addGame"
+         ACTION="/add"
+         METHOD="post">
+
+         <br><br>
+         Name:
+         <INPUT TYPE="TEXT" NAME="name_desc" VALUE="" pattern="^\S(.*\S)?$" title="Please enter a value without leading or trailing spaces" required> <br>
+
+  <br><br>
+         Price (in the form of 00.00):
+         <INPUT TYPE="TEXT" NAME="price_desc" VALUE="" pattern="^\d+(\.\d{1,2})?$" title="Please enter a valid decimal format" required> <br>
+
+  <br><br>
+         Publisher:
+         <INPUT TYPE="TEXT" NAME="publisher_desc" VALUE="" pattern="^\S(.*\S)?$" title="Please enter a value without leading or trailing spaces" required> <br>
+
+    <br><br>
+         Player Types (i.e. "1 = Singleplayer, 2 = Multiplayer Co-op, 3 = Multiplayer Cross-Platform"):
+         <INPUT TYPE="TEXT" NAME="player_type_desc" VALUE="" pattern="^\d+$" title="Please enter a numeric value without leading or trailing spaces" required> <br>
+
+         <br><br>
+         <INPUT TYPE="submit" VALUE="Add">
+   </FORM>
+
+</body>
+</html>
