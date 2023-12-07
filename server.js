@@ -23,10 +23,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Create a MySQL connection pool
 const mysql = require('mysql');
 const con = mysql.createConnection({
-    host: "35.232.159.218",
-  user: "root",
-  password: "Queries42$",
-  database: "game_stock"
+    host: "--",
+  user: "--",
+  password: "--",
+  database: "--"
 });
 
 // Connect to the database
