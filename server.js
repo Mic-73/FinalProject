@@ -317,43 +317,7 @@ app.get("/new_search", function (req, res) {
     }
 });
 
-function gameDetails(id) {
-    app.get("/gameDetails", function (req, res) {
-        let html = "<html><script>"
-        sql_query = "Select * from games where game_id = id"
-        con.query(sql_query, function (err, result, fields) {
-            if (err) {
-                console.error("Error executing SQL query:", err);
-                res.status(500).send("Internal Server Error");
-                return;
-            } else {
-                html += `<td>${result[0].name}</td>`;
-                html += `<td>${result[0].price}</td>`;
-                html += `<td>${result[0].publisher}</td>`;
-                html += `<td>${result[0].player_type}</td>`;
-            }
-        })
-        html += "</script><html>";
-        res.send(html);
-    })
-    let html = "<html><script>"
-    html = ""
-    sql_query = "Select * from games where game_id = id"
-    con.query(sql_query, function (err, result, fields) {
-        if (err) {
-            console.error("Error executing SQL query:", err);
-            res.status(500).send("Internal Server Error");
-            return;
-        } else {
-            html += `<td>${result[0].name}</td>`;
-            html += `<td>${result[0].price}</td>`;
-            html += `<td>${result[0].publisher}</td>`;
-            html += `<td>${player_type}</td>`;
-        }
-    })
-    html += "</script><html>";
-    res.send(html);
-}
+
 app.post("/Staff_Login", function (req, res) {
     // ... (rest of your /Staff_Login route handling)
     var username = req.body.uname.trim();   // extract the strings received from the browser
@@ -545,20 +509,23 @@ app.post("/update", function (req, res) {
             var publisher = result[0].publisher
             var player_type = result[0].player_type;
             let html2 = "<html><body>"
+            html2 += "<h3 style=\"color:Tomato\">Update</h3>"
 
             html2 += "<form name=\"updateForm\"\n" +
                 "         action=\"/applyUpdate\"\n" +
                 "         method=\"post\">\n" +
                 "\n" +
                 "         <br><br>\n" +
-                "         Update Game:\n<br>" +
                 `         Game ID(Can't be changed): <br><input type="text" name="gid" value= "${gid}" readonly > \n<br>` +
                 `         Name:<br><input type="text" name="name" value= "${name}"  > \n<br>` +
                 `         Price:<br><input type="text" name="price" value= "${price}"  > \n<br>` +
                 `         Publisher:<br><input type="text" name="publisher" value= "${publisher}"  > \n<br>` +
-                `         Player Type:<br><input type="text" name="player_type" value= "${player_type}"  > \n<br><br>` +
+                `         Player Type(i.e. "1 = Singleplayer, 2 = Multiplayer Co-op, 3 = Multiplayer Cross-Platform"):
+                          <br><input type="text" name="player_type" value= "${player_type}"  > \n<br><br>` +
                 "         <input type=\"submit\" value=\"Enter\">\n" +
-                "   </form>";
+                "   </form>" +
+                "<br><br>\n" +
+                "<a href = \"/menu\">Back to Main Menu</a>"
             html2 += "</body></html>"
             res.send(html2);
         }
