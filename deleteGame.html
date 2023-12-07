@@ -1,27 +1,100 @@
 <!DOCTYPE html>
-<html>
-<body style="font-family:arial">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 50px;
+        }
 
-<h3 style="color:Tomato">Delete</h3>
+        h3 {
+      font-family: 'Futura', sans-serif;
+      font-size: 28px;
+    }
 
-<FORM NAME="delete"
-      ACTION="http://localhost:3000/delete"
-      METHOD="post">
+        .delete {
+      color: #3366cc;
+    }
+
+    .game {
+      color: #000; /* Blue color */
+    }
+
+    .warning {
+      color: red; /* Blue color */
+    }
+
+        form {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            background-color: #3336cc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #111acc;
+        }
+
+        a {
+            color: #3366cc;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+      <h3><span class="delete">Delete</span><span class="game"> a Game</span></h3>
+
+
+    <form name="delete" action="http://localhost:3000/delete" method="post">
+
+        <br><br>
+        Please Enter Inventory ID: <br>
+        <input type="text" name="gid" value="" pattern="^\d+$" title="Please enter a numeric value without leading or trailing spaces" required> <br>
+
+        <br><br>
+        Are you sure you want to delete this item?<br> <span class="warning">This cannot be recovered!</span><br>
+        <input type="checkbox" name="Confirm" value="Yes" required> <br>
+
+        <input type="submit" value="Enter">
+    </form>
 
     <br><br>
-    Please Enter Inventory ID: <br>
-    <INPUT TYPE="TEXT" NAME="gid" VALUE="" > <br>
-
-    <br><br>
-    Are you sure you want to delete? This game cannot be recovered!<br>
-    <INPUT TYPE="Checkbox" NAME="Confirm" VALUE="Yes" > <br>
-
-    <INPUT TYPE="submit" VALUE="Enter">
-</FORM>
-
-<br><br>
-<a href = "/menu">Back to Main Menu</a>
+    <a href="/menu">Back to Main Menu</a>
 
 </body>
 </html>
-

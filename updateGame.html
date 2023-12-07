@@ -1,21 +1,75 @@
 <!DOCTYPE html>
-<html>
-<body style="font-family:arial">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 50px;
+        }
 
-<h3 style="color:Tomato">Update</h3>
+        h3 {
+            color: #3366cc;
+            font-family: 'Futura', sans-serif;
+            font-size: 28px;
+        }
 
-<FORM NAME="update"
-      ACTION="http://localhost:3000/update"
-      METHOD="post">
+        form {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .update-button {
+            text-align: center; /* Center the button */
+        }
+
+        input[type="submit"] {
+            background-color: #3336cc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #111acc;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Update</h3>
+
+    <form name="update" action="http://localhost:3000/update" method="post">
+
+        <br><br>
+        Please Enter Inventory ID:<br>
+        <input type="text" name="iid" value="" pattern="^\d+$" title="Please enter a numeric value without leading or trailing spaces" required> <br>
+        <br>
+        <div class="update-button">
+            <input type="submit" value="Update">
+        </div>
+    </form>
 
     <br><br>
-    Please Enter Game ID:<br>
-    <INPUT TYPE="TEXT" NAME="iid" VALUE=""> <br>
-    <br>
-    <INPUT TYPE="submit" VALUE="Enter">
-</FORM>
-
+    <a href="/menu">Back to Main Menu</a>
 
 </body>
 </html>
-

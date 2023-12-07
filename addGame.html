@@ -3,35 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 50px;
+        }
+
+        h3 {
+      font-family: 'Futura', sans-serif;
+      font-size: 28px;
+    }
+
+        .add {
+      color: #3366cc;
+    }
+
+    .game {
+      color: #000; /* Blue color */
+    }
+
+        form {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .add-button {
+            text-align: center; /* Center the button */
+        }
+
+        input[type="submit"] {
+            background-color: #3336cc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #111acc;
+        }
+
+        a {
+            color: #3366cc;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
-<h3 style="color:Tomato">Add</h3>
+  <h3><span class="add">Add</span><span class="game"> a Game</span></h3>
 
-<FORM NAME="addGame"
-         ACTION="/add"
-         METHOD="post">
+    <form name="addGame" action="/add" method="post">
 
-         <br><br>
-         Name:<br>
-         <INPUT TYPE="TEXT" NAME="name_desc" VALUE="" pattern="^\S(.*\S)?$" title="Please enter a value without leading or trailing spaces" required> <br>
+        <br><br>
+        Name:<br>
+        <input type="text" name="name_desc" value="" pattern="^\S(.*\S)?$" title="Please enter a value without leading or trailing spaces" required> <br>
 
-  <br><br>
-         Price (in the form of 00.00):<br>
-         <INPUT TYPE="TEXT" NAME="price_desc" VALUE="" pattern="^\d+(\.\d{1,2})?$" title="Please enter a valid decimal format" required> <br>
+        <br><br>
+        Price (in the form of 00.00):<br>
+        <input type="text" name="price_desc" value="" pattern="^\d+(\.\d{1,2})?$" title="Please enter a valid decimal format" required> <br>
 
-  <br><br>
-         Publisher:<br>
-         <INPUT TYPE="TEXT" NAME="publisher_desc" VALUE="" pattern="^\S(.*\S)?$" title="Please enter a value without leading or trailing spaces" required> <br>
+        <br><br>
+        Publisher:<br>
+        <input type="text" name="publisher_desc" value="" pattern="^\S(.*\S)?$" title="Please enter a value without leading or trailing spaces" required> <br>
+
+        <br><br>
+        Player Types (i.e. <br>"1 = Singleplayer, <br>2 = Multiplayer Co-op, <br>3 = Multiplayer Cross-Platform"):<br>
+        <input type="text" name="player_type_desc" value="" pattern="^\d+$" title="Please enter a numeric value without leading or trailing spaces" required> <br>
+
+        <br><br>
+        <div class="add-button">
+            <input type="submit" value="Add">
+        </div>
+    </form>
 
     <br><br>
-         Player Types (i.e. "1 = Singleplayer, 2 = Multiplayer Co-op, 3 = Multiplayer Cross-Platform"):<br>
-         <INPUT TYPE="TEXT" NAME="player_type_desc" VALUE="" pattern="^\d+$" title="Please enter a numeric value without leading or trailing spaces" required> <br>
-
-         <br><br>
-         <INPUT TYPE="submit" VALUE="Add">
-   </FORM>
-<br><br>
-<a href = "/menu">Back to Main Menu</a>
+    <a href="/menu">Back to Main Menu</a>
 </body>
 </html>

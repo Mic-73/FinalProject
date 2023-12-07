@@ -1,25 +1,81 @@
 <!DOCTYPE html>
 <html>
-<body style="font-family:arial">
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      margin: 50px;
+    }
 
-<h3>Login</h3>
+    h1 {
+      font-family: 'Futura', sans-serif;
+      font-size: 48px;
+    }
 
-<FORM NAME="login"
-         ACTION="http://localhost:3000/Staff_Login"
-      METHOD="post">
+    .game {
+      color: #000;
+    }
+
+    .stock {
+      color: #3366cc; /* Blue color */
+    }
+
+    h3 {
+      color: #555;
+    }
+
+    form {
+      width: 300px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      background-color: #3336cc;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #111acc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1><span class="game">Game</span><span class="stock">Stock</span></h1>
+
+  <h3>Staff Member Login</h3>
+
+  <form name="login" action="http://localhost:3000/Staff_Login" method="post">
 
     <br><br>
     Username:
-    <INPUT TYPE="TEXT" NAME="uname" VALUE="" > <br>
+    <input type="text" name="uname" value=""> <br>
     <br><br>
     Password:
-    <INPUT TYPE="Password" NAME="pword" VALUE="" > <br>
+    <input type="password" name="pword" value=""> <br>
 
     <br><br>
-    <INPUT TYPE="submit" VALUE="Enter">
-</FORM>
-
+    <input type="submit" value="Enter">
+  </form>
 
 </body>
 </html>
-
