@@ -23,10 +23,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Create a MySQL connection pool
 const mysql = require('mysql');
 const con = mysql.createConnection({
-    host: "--",
-  user: "--",
-  password: "--",
-  database: "--"
+    host: "35.232.159.218",
+  user: "root",
+  password: "Queries42$",
+  database: "game_stock"
 });
 
 // Connect to the database
@@ -139,11 +139,11 @@ app.get("/menu", function (req, res) {
 
                 html += "<tr>";
                 // Make the game name a link to a new page
-    html += `<td><a href="/gameDetails?gameId=${result[i].game_id}">${result[i].gname}</a></td>`;
+    html += `<td>${result[i].gname}</td>`;
 
     html += `<td>${result[i].price}</td>`;
     html += `<td>${result[i].publisher}</td>`;
-    html += `<td>${playerTypeValue}</td></tr>`;
+    html += `<td>${playerTypeValue}</tr></td`;
 
             }
 
@@ -170,6 +170,8 @@ app.get("/menu", function (req, res) {
         html += "}";
         html += "</script></html>";
             html += "<br><br><button><a href=\"/addGame\">Add Game</a></button>"
+            html += "<button><a href=\"/updateGame\">Update</a></button>"
+            html += "<button><a href=\"/deleteGame\">Delete</a></button>"
 
 
 
@@ -271,11 +273,11 @@ app.get("/new_search", function (req, res) {
 
                 html += "<tr>";
                 // Make the game name a link to a new page
-    html += `<td><a href="/gameDetails?gameId=${result[i].game_id}">${result[i].gname}</a></td>`;
+                html += `<td>${result[i].gname}</td>`;
 
     html += `<td>${result[i].price}</td>`;
     html += `<td>${result[i].publisher}</td>`;
-    html += `<td>${playerTypeValue}</td></tr>`;
+    html += `<td>${playerTypeValue}</tr></td>`;
             }
 
             html += "</table>";
@@ -313,9 +315,84 @@ app.get("/new_search", function (req, res) {
     }
 });
 
+function gameDetails(id) {
+    app.get("/gameDetails", function (req, res) {
+        let html = "<html><script>"
+        sql_query = "Select * from games where game_id = id"
+        con.query(sql_query, function (err, result, fields) {
+            if (err) {
+                console.error("Error executing SQL query:", err);
+                res.status(500).send("Internal Server Error");
+                return;
+            } else {
+                html += `<td>${result[0].name}</td>`;
+                html += `<td>${result[0].price}</td>`;
+                html += `<td>${result[0].publisher}</td>`;
+                html += `<td>${result[0].player_type}</td>`;
+            }
+        })
+        html += "</script><html>";
+        res.send(html);
+    })
+    let html = "<html><script>"
+    html = ""
+    sql_query = "Select * from games where game_id = id"
+    con.query(sql_query, function (err, result, fields) {
+        if (err) {
+            console.error("Error executing SQL query:", err);
+            res.status(500).send("Internal Server Error");
+            return;
+        } else {
+            html += `<td>${result[0].name}</td>`;
+            html += `<td>${result[0].price}</td>`;
+            html += `<td>${result[0].publisher}</td>`;
+            html += `<td>${player_type}</td>`;
+        }
+    })
+    html += "</script><html>";
+    res.send(html);
+}
+app.post("/Staff_Login", function (req, res) {
+    // ... (rest of your /Staff_Login route handling)
+    var username = req.body.uname.trim();   // extract the strings received from the browser
+    var password = req.body.pword.trim();   // extract the strings received from the browser
+
+    // Using a parameterized query
+    var sql_query = "SELECT * " +
+        "FROM login l " +
+        "JOIN login_staff ls USING(username) " +
+        "JOIN staff sta USING(staff_id) " +
+        "WHERE l.username = ? AND l.password = ?";
+
+    console.log("Executing SQL query:", sql_query);
+    con.query(sql_query, [username, password], function (err, result, fields) { // execute the SQL string
+        if (err) {
+            console.error("Error executing SQL query:", err);
+            res.status(500).send("Internal Server Error");
+            return;
+        } else {
+            if (result.length > 0) {
+                // Valid username and password
+                // Redirect to the menu page
+                req.session.user = result[0]; // Assuming result[0] contains user data
+                res.redirect("/menu");
+            } else {
+                // No matching user found
+                readAndServe("./Staff_Login.html", res, "Invalid username or password");
+            }
+        }
+    });
+});
+
 app.get("/addGame", function (req, res) {
     readAndServe("./addGame.html", res)
   });
+app.get("/updateGame", function (req, res) {
+    readAndServe("./updateGame.html", res)
+});
+app.get("/deleteGame", function (req, res) {
+    readAndServe("./deleteGame.html", res)
+});
 
 
 //******************************************************************************
@@ -444,6 +521,166 @@ app.post("/add", function (req, res) {
         });
     });
 });
+
+app.post("/update", function (req, res) {
+    var gid = req.body.gid; // Remove extra spaces from the name
+
+    // Get the maximum game_id from the games table
+    checkID  = "Select * from games where game_id = ?"
+    con.query(checkID, gid, function (err, result, fields) {
+        if (err) {
+            console.error("Error executing SQL query:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+        if (result.length == 0) {
+            // No matching user found
+            readAndServe("./updateGame.html", res, "Game ID does not exist");
+        }
+        else {
+            var name = result[0].gname; // Remove extra spaces from the name
+            var price = result[0].price;
+            var publisher = result[0].publisher
+            var player_type = result[0].player_type;
+            let html2 = "<html><body>"
+
+            html2 += "<form name=\"updateForm\"\n" +
+                "         action=\"/applyUpdate\"\n" +
+                "         method=\"post\">\n" +
+                "\n" +
+                "         <br><br>\n" +
+                "         Update Game:\n<br>" +
+                `         Game ID(Can't be changed): <br><input type="text" name="gid" value= "${gid}" readonly > \n<br>` +
+                `         Name:<br><input type="text" name="name" value= "${name}"  > \n<br>` +
+                `         Price:<br><input type="text" name="price" value= "${price}"  > \n<br>` +
+                `         Publisher:<br><input type="text" name="publisher" value= "${publisher}"  > \n<br>` +
+                `         Player Type:<br><input type="text" name="player_type" value= "${player_type}"  > \n<br><br>` +
+                "         <input type=\"submit\" value=\"Enter\">\n" +
+                "   </form>";
+            html2 += "</body></html>"
+            res.send(html2);
+            app.post("/applyUpdate", function (req, res) {
+                var gid = req.body.gid; // Remove extra spaces from the name
+                var name = req.body.name;
+                var price = req.body.price;
+                var publisher = req.body.publisher;
+                var play_type = req.body.player_type;
+
+                if (play_type === 'Singleplayer') {
+                    play_type = 1;
+                }
+                else if (play_type === 'Singleplayer, Multiplayer Co-op') {
+                    play_type = 2;
+                }
+                else if (play_type === 'Singleplayer, Multiplayer Co-op, Multiplayer Cross-Platform') {
+                    play_type = 3;
+                }
+                else if (play_type === 'Multiplayer Co-op') {
+                    play_type = 4;
+                }
+                else if (play_type === 'Multiplayer Cross-Platform') {
+                    play_type = 5;
+                }
+                else if (play_type === 'Singleplayer, Multiplayer Cross-Platform') {
+                    play_type = 6;
+                }
+                else if (play_type === 'Multiplayer Co-op, Multiplayer Cross-Platform') {
+                    play_type = 7;
+                }
+
+
+                // *Getting duplicate key error when this runs
+                updateQuery  = "Update games set gname = ?, price = ?, publisher = ?, player_type = ? where game_id = ?"
+                con.query(updateQuery, [name, price, publisher, play_type, gid], function (err, result, fields) {
+                    if (err) {
+                        console.error("Error executing SQL query:", err);
+                        return res.status(500).send("Internal Server Error");
+                    }
+                    else {
+                        res.redirect("/menu");
+                    }
+                });
+            });
+        }
+    });
+});
+
+app.post("/applyUpdate", function (req, res) {
+    var gid = req.body.gid; // Remove extra spaces from the name
+    var name = req.body.name;
+    var price = req.body.price;
+    var publisher = req.body.publisher;
+    var play_type = req.body.play_type;
+
+    if (play_type === 'Singleplayer') {
+        play_type = 1;
+    }
+    else if (play_type === 'Singleplayer, Multiplayer Co-op') {
+        play_type = 2;
+    }
+    else if (play_type === 'Singleplayer, Multiplayer Co-op, Multiplayer Cross-Platform') {
+        play_type = 3;
+    }
+    else if (play_type === 'Multiplayer Co-op') {
+        play_type = 4;
+    }
+    else if (play_type === 'Multiplayer Cross-Platform') {
+        play_type = 5;
+    }
+    else if (play_type === 'Singleplayer, Multiplayer Cross-Platform') {
+        play_type = 6;
+    }
+    else if (play_type === 'Multiplayer Co-op, Multiplayer Cross-Platform') {
+        play_type = 7;
+    }
+
+
+    // Get the maximum game_id from the games table
+    updateQuery  = "Update games set game_id = ?, gname = ?, price = ?, publisher = ?, player_type = ?"
+    con.query(updateQuery, [gid, name, price, publisher, play_type], function (err, result, fields) {
+        if (err) {
+            console.error("Error executing SQL query:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+        else {
+            res.redirect("/menu");
+        }
+    });
+});
+
+
+app.post("/delete", function (req, res) {
+    var gid = req.body.gid.trim(); // Remove extra spaces from the name
+    var confirm = req.body.Confirm
+    // Ensure all required fields are filled
+
+
+    // Get the maximum game_id from the games table
+    checkID  = "Select * from games where game_id = ?"
+    deleteGame = "Delete from games where game_id = ?"
+    con.query(checkID, gid, function (err, result, fields) {
+        if (err) {
+            console.error("Error executing SQL query:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+        if (confirm != "Yes") {
+            readAndServe("./deleteGame.html", res, "Check Box not checked");
+        }
+        else if (result.length == 0) {
+            // No matching user found
+            readAndServe("./deleteGame.html", res, "Game ID does not exist");
+        }
+        else {
+            con.query(deleteGame, gid, function (err, result, fields) {
+                if (err) {
+                    console.error("Error executing SQL query:", err);
+                    return res.status(500).send("Internal Server Error");
+                }
+                else res.redirect("/menu");
+            })
+        }
+    });
+});
+
 
 
 
