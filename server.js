@@ -1,6 +1,7 @@
 //*** Authors: Michael Wood, Deston Willis, Chris Hinckley
+//*** -- Author identification for each section is labeled
 //*** Course Title: CSC 351 Database Management Systems Fall 2023
-//*** Submission Data:
+//*** Submission Data: 12/11/2023
 //*** Assignment: Final Project
 //*** Purpose of Program: File for server side of the project
 
@@ -15,6 +16,7 @@ const fs = require('fs');
 // Instance of express
 const app = express();
 
+// Author: Michael Wood
 // Set up for session tracking
 app.use(session({
     secret: 'k7vghjwmjw9cbrPRV$$$mrkoy',
@@ -60,6 +62,7 @@ function readAndServe(path, res, errorMessage = "") {
 //*** Receive the following GET requests
 //******************************************************************************
 
+// Author: Michael Wood
 // Set up login page to be seen first
 app.get("/", function (req, res) {
     readAndServe("./Staff_Login.html", res)
@@ -76,16 +79,6 @@ app.get("/Staff_Login", function (req, res) {
 app.get("/addGame", function (req, res) {
     readAndServe("./addGame.html", res)
   });
-
-// Get to update page
-app.get("/updateGame", function (req, res) {
-    readAndServe("./updateGame.html", res)
-});
-
-// Get to delete page
-app.get("/deleteGame", function (req, res) {
-    readAndServe("./deleteGame.html", res)
-});
 
 // Get to menu page
 app.get("/menu", function (req, res) {
@@ -404,51 +397,23 @@ app.get("/new_search", function (req, res) {
     }
 });
 
-// Unused function, cut due to time
-// Would display the information of individual game that was clicked on in the menu table
-function gameDetails(id) {
-    app.get("/gameDetails", function (req, res) {
-        let html = "<html><script>"
-        sql_query = "Select * from games where game_id = id"
-        con.query(sql_query, function (err, result, fields) {
-            if (err) {
-                console.error("Error executing SQL query:", err);
-                res.status(500).send("Internal Server Error");
-                return;
-            } else {
-                html += `<td>${result[0].name}</td>`;
-                html += `<td>${result[0].price}</td>`;
-                html += `<td>${result[0].publisher}</td>`;
-                html += `<td>${result[0].player_type}</td>`;
-            }
-        })
-        html += "</script><html>";
-        res.send(html);
-    })
-    let html = "<html><script>"
-    html = ""
-    sql_query = "Select * from games where game_id = id"
-    con.query(sql_query, function (err, result, fields) {
-        if (err) {
-            console.error("Error executing SQL query:", err);
-            res.status(500).send("Internal Server Error");
-            return;
-        } else {
-            html += `<td>${result[0].name}</td>`;
-            html += `<td>${result[0].price}</td>`;
-            html += `<td>${result[0].publisher}</td>`;
-            html += `<td>${player_type}</td>`;
-        }
-    })
-    html += "</script><html>";
-    res.send(html);
-}
+// Author: Deston Willis
+// Get to update page
+app.get("/updateGame", function (req, res) {
+    readAndServe("./updateGame.html", res)
+});
+
+// Get to delete page
+app.get("/deleteGame", function (req, res) {
+    readAndServe("./deleteGame.html", res)
+});
 
 
 //******************************************************************************
 //*** POST requests:
 //******************************************************************************
 
+// Author: Michael Wood
 // login page
 app.post("/Staff_Login", function (req, res) {
 
@@ -590,6 +555,7 @@ app.post("/add", function (req, res) {
     });
 });
 
+// Authors: Michael Wood, Deston Willis
 // Update Function
 app.post("/update", function (req, res) {
     // Get inventory ID entered
@@ -717,6 +683,7 @@ app.post("/update", function (req, res) {
     });
 });
 
+// Author: Deston Willis
 // Applying the update function
 app.post("/applyUpdate", function (req, res) {
     // Set up variables
@@ -765,6 +732,7 @@ app.post("/applyUpdate", function (req, res) {
     });
 });
 
+// Authors: Michael Wood, Deston Willis
 // Delete function
 app.post("/delete", function (req, res) {
     // Set up variables
