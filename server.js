@@ -16,7 +16,7 @@ const fs = require('fs');
 // Instance of express
 const app = express();
 
-// Author: Michael Wood
+//*** Author: Michael Wood
 // Set up for session tracking
 app.use(session({
     secret: 'k7vghjwmjw9cbrPRV$$$mrkoy',
@@ -62,7 +62,7 @@ function readAndServe(path, res, errorMessage = "") {
 //*** Receive the following GET requests
 //******************************************************************************
 
-// Author: Michael Wood
+//*** Author: Michael Wood
 // Set up login page to be seen first
 app.get("/", function (req, res) {
     readAndServe("./Staff_Login.html", res)
@@ -397,7 +397,7 @@ app.get("/new_search", function (req, res) {
     }
 });
 
-// Author: Deston Willis
+//*** Author: Deston Willis
 // Get to update page
 app.get("/updateGame", function (req, res) {
     readAndServe("./updateGame.html", res)
@@ -413,7 +413,7 @@ app.get("/deleteGame", function (req, res) {
 //*** POST requests:
 //******************************************************************************
 
-// Author: Michael Wood
+//*** Author: Michael Wood
 // login page
 app.post("/Staff_Login", function (req, res) {
 
@@ -555,7 +555,7 @@ app.post("/add", function (req, res) {
     });
 });
 
-// Authors: Michael Wood, Deston Willis
+//*** Authors: Michael Wood, Deston Willis
 // Update Function
 app.post("/update", function (req, res) {
     // Get inventory ID entered
@@ -683,7 +683,7 @@ app.post("/update", function (req, res) {
     });
 });
 
-// Author: Deston Willis
+//*** Author: Deston Willis
 // Applying the update function
 app.post("/applyUpdate", function (req, res) {
     // Set up variables
@@ -732,7 +732,7 @@ app.post("/applyUpdate", function (req, res) {
     });
 });
 
-// Authors: Michael Wood, Deston Willis
+//*** Authors: Michael Wood, Deston Willis
 // Delete function
 app.post("/delete", function (req, res) {
     // Set up variables
