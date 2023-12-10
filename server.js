@@ -1,3 +1,10 @@
+//*** Authors: Michael Wood, Deston Willis, Chris Hinckley
+//*** Course Title: CSC 351 Database Management Systems Fall 2023
+//*** Submission Data:
+//*** Assignment: Final Project
+//*** Purpose of Program: File for server side of the project
+
+// Import express framework, body parser, session, path, file system, and define port number
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -5,11 +12,12 @@ const port = 3000;
 const path = require("path");
 const fs = require('fs');
 
-// Create an instance of Express
+// Instance of express
 const app = express();
 
+// Set up for session tracking
 app.use(session({
-    secret: 'random-key', // Change this to a secure random string
+    secret: 'k7vghjwmjw9cbrPRV$$$mrkoy',
     resave: false,
     saveUninitialized: true
 }));
@@ -20,27 +28,27 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-// Create a MySQL connection pool
+// Set up mySQL connection
 const mysql = require('mysql');
 const con = mysql.createConnection({
-    host: "--",
-  user: "--",
-  password: "--",
-  database: "--"
+    host: "35.232.159.218",
+    user: "root",
+    password: "Queries42$",
+    database: "game_stock"
 });
 
-// Connect to the database
+// Connect to the database in mySQL
 con.connect(function (err) {
     if (err) throw err;
     console.log("Connected!");
 });
 
-// Function to read and serve HTML files
+// Set up reading of HTML files
 function readAndServe(path, res, errorMessage = "") {
   fs.readFile(path, function (err, data) {
     res.setHeader('Content-Type', 'text/html');
 
-    // Append an error message to the HTML content
+    // Error message
     data = data.toString().replace("</body>", `<p style="color: red;">${errorMessage}</p></body>`);
 
     res.end(data);
@@ -49,33 +57,59 @@ function readAndServe(path, res, errorMessage = "") {
 
 
 //******************************************************************************
-//*** this routing table handles all the GET requests from the browser
+//*** Receive the following GET requests
 //******************************************************************************
 
+// Set up login page to be seen first
 app.get("/", function (req, res) {
     readAndServe("./Staff_Login.html", res)
-
 });
 
+// Get to login page
 app.get("/Staff_Login", function (req, res) {
+    // Set session tracking to null when this page is loaded/when somebody logs out
+    req.session.user = null;
     readAndServe("./Staff_Login.html", res);
   });
 
+// Set to add page
+app.get("/addGame", function (req, res) {
+    readAndServe("./addGame.html", res)
+  });
+
+// Get to update page
+app.get("/updateGame", function (req, res) {
+    readAndServe("./updateGame.html", res)
+});
+
+// Get to delete page
+app.get("/deleteGame", function (req, res) {
+    readAndServe("./deleteGame.html", res)
+});
+
+// Get to menu page
 app.get("/menu", function (req, res) {
     if (req.session.user) {
-        const userData = req.session.user; // Get user information from the session
 
+        // Get user data (username and password)
+        var userData = req.session.user; // Get user information from the session
+
+        // SELECT SQL Operation
+        // SQL Query for store inventory
         const sql_query = "SELECT i.inventory_id, g.gname, g.price, g.publisher, g.player_type FROM inventory i JOIN games g USING(game_id)";
 
         con.query(sql_query, function (err, result, fields) {
+            // Send Error
             if (err) {
                 console.error("Error executing SQL query:", err);
                 res.status(500).send("Internal Server Error");
                 return;
             }
 
-            // Build an HTML string with the fetched data and user information
+            // Builds html string to display data from sql query
             let html = "<html><head><style>";
+
+            // Set up css for the page
             html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; margin: 50px; }";
             html += "h1 { color: #3366cc; }";
             html += "h2 { color: #000; }";
@@ -89,14 +123,13 @@ app.get("/menu", function (req, res) {
             html += ".center-button { text-align: center; margin-top: 20px; }";
             html += "a { color: #fff; background-color: #3366cc; text-decoration: none; display: inline-block; padding: 10px 20px; margin: 20px; border: none}";
             html += "a:hover { background-color: #111acc; }";
-
             html += "</style></head><body>";
 
-            // Display user information
+            // Display user information/verify session tracking
             html += `<h1>Welcome, ${userData.staff_name}!</h1>`;
             html += "<h2>Inventory Menu</h2>";
 
-            // Add the search dropdown
+            // Search dropdown menu + search bar
             html += "<form name=\"search\" action=\"/new_search\" method=\"get\" style=\"text-align: left;\">";
             html += "<br><br>Search by:";
             html += "<select name=\"criteria\">";
@@ -110,27 +143,25 @@ app.get("/menu", function (req, res) {
             html += "</div>";
             html += "</form>";
 
-
-            // Add the Update, Add, and Delete buttons
+            // Update, Add, and Delete buttons
             html += "<div class='center-button'>";
             html += "<button style='border: none;'><a href='/updateGame'>Update</a></button>";
             html += "<button style='border: none;'><a href='/addGame'>Add Game</a></button>";
             html += "<button style='border: none;'><a href='/deleteGame'>Delete</a></button>";
             html += "<button style='border: none;'><a href='/Staff_Login'>Log Out</a></button><br><br>";
-
             html += "</div>";
-
             html += "<table border='1' id='inventoryTable'>";
-            html += "<tr>";
 
+            html += "<tr>";
+            // Now add the column headings for the table, adds sorting arrows for each column as well
             for (var i = 0; i < fields.length; i++) {
                 html += `<th onclick='sortTable(${i})'>${fields[i].name.toUpperCase()} <span id='arrow${i}'></span></th>`;
             }
-
             html += "</tr>";
 
-            // Prints rows of table data
+            // Adds rows of data gathered
             for (var i = 0; i < result.length; i++) {
+                // Set up for player_type value
                 var playerTypeValue = result[i].player_type;
                 if (playerTypeValue === 1) {
                     playerTypeValue = 'Singleplayer';
@@ -148,6 +179,7 @@ app.get("/menu", function (req, res) {
                     playerTypeValue = 'Multiplayer Co-op, Multiplayer Cross-Platform';
                 }
 
+                // Set up the rest of the table
                 html += "<tr>";
                 html += `<td>${result[i].inventory_id}</td>`;
                 html += `<td>${result[i].gname}</td>`;
@@ -156,9 +188,9 @@ app.get("/menu", function (req, res) {
                 html += `<td>${playerTypeValue}</td>`;
                 html += "</tr>";
             }
-
             html += "</table>";
 
+            // Adss sorting function for the arrows in each column heading
             html += "<script>";
             html += "function sortTable(column) {";
             html += "const table = document.getElementById('inventoryTable');";
@@ -174,6 +206,8 @@ app.get("/menu", function (req, res) {
             html += "rows.sort((a, b) => {";
             html += "let aValue = a.cells[column].innerText;";
             html += "let bValue = b.cells[column].innerText;";
+
+            // Convert values to numbers for the inventory_id/price column
             html += "if (column === 0 || column === 2) {";
             html += "aValue = parseInt(aValue);";
             html += "bValue = parseInt(bValue);";
@@ -181,6 +215,9 @@ app.get("/menu", function (req, res) {
             html += "aValue = aValue.toLowerCase();";
             html += "bValue = bValue.toLowerCase();";
             html += "}";
+
+            // If either value is NaN, perform string comparison
+            // Otherwise, perform numeric comparison
             html += "if (isNaN(aValue) || isNaN(bValue)) {";
             html += "return ascending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);";
             html += "} else {";
@@ -193,20 +230,26 @@ app.get("/menu", function (req, res) {
 
             html += "</body></html>";
 
-            // Send the HTML string as the response
+            // Send the HTML string
             res.send(html);
         });
     } else {
-        // User is not authenticated, redirect to login or handle accordingly
+        // If the user is not authenticated, they are sent back to the login page
         res.redirect("/Staff_Login");
     }
 });
 
+// Get new_search page, typically after a new search of information
+// This is mainly the menu page, but only gets data according to the search provided
 app.get("/new_search", function (req, res) {
     if (req.session.user) {
-        const userData = req.session.user; // Get user information from the session
 
-        var criteria = req.query.criteria || "name"; // Default criteria to "name" if not provided
+        // User tracking
+        const userData = req.session.user;
+
+        // Set the criteria of the search according to the search dropdown menu
+        // Default of search is "name" if nothing is provided
+        var criteria = req.query.criteria || "name";
         if (criteria === 'name') {
             criteria = "gname";
         } else if (criteria === 'Publisher') {
@@ -214,22 +257,28 @@ app.get("/new_search", function (req, res) {
         } else if (criteria === 'price') {
             criteria = "price";
         }
-        const desc = req.query.desc || ""; // Default desc to an empty string if not provided
 
-        // Construct the SQL query with WHERE clause for search criteria
+        // Set the actual search, empty string if nothing is entered
+        const desc = req.query.desc || "";
+
+        // SELECT SQL Operation
+        // SQL Query according to search criteria and description
         const sql_query = `SELECT i.inventory_id, g.gname, g.price, g.publisher, g.player_type 
                            FROM inventory i JOIN games g USING(game_id)
                            WHERE ${criteria} LIKE ?`;
 
         con.query(sql_query, [`%${desc}%`], function (err, result, fields) {
+            // Error Tracking
             if (err) {
                 console.error("Error executing SQL query:", err);
                 res.status(500).send("Internal Server Error");
                 return;
             }
 
-            // Build an HTML string with the fetched data and user information
+            // Set up the HTML string
             let html = "<html><head><style>";
+
+            // Set up css for the page
             html += "body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; margin: 50px; }";
             html += "h1 { color: #3366cc; }";
             html += "h2 { color: #000; }";
@@ -245,11 +294,11 @@ app.get("/new_search", function (req, res) {
             html += "a:hover { background-color: #111acc; }";
             html += "</style></head><body>";
 
-            // Display user information
+            // Display user information/verify session tracking
             html += `<h1>Welcome, ${userData.staff_name}!</h1>`;
             html += "<h2>Inventory Menu</h2>";
 
-            // Add the search dropdown
+            // Search dropdown menu + bar
             html += "<form name=\"search\" action=\"/new_search\" method=\"get\" style=\"text-align: left;\">";
             html += "<br><br>Search by:";
             html += "<select name=\"criteria\">";
@@ -263,17 +312,19 @@ app.get("/new_search", function (req, res) {
             html += "</div>";
             html += "</form>";
 
+            // Set up the table
             html += "<body><table border=1 id=\"inventoryTable\"><br><br>";
 
-            // Print column headings with sorting arrows
+            // Display the table columns with sorting arrows in each column
             html += "<tr>";
             for (var i = 0; i < fields.length; i++) {
                 html += `<th onclick=\"sortTable(${i})\">${fields[i].name.toUpperCase()} <span id=\"arrow${i}\"></span></th>`;
             }
             html += "</tr>";
 
-            // Prints rows of table data
+            // Display rows of data
             for (var i = 0; i < result.length; i++) {
+                // Set up for player_type
                 var playerTypeValue = result[i].player_type;
                 if (playerTypeValue === 1) {
                     playerTypeValue = 'Singleplayer';
@@ -291,8 +342,8 @@ app.get("/new_search", function (req, res) {
                     playerTypeValue = 'Multiplayer Co-op, Multiplayer Cross-Platform';
                 }
 
+                // Display the rest of the table
                 html += "<tr>";
-                // Make the game name a link to a new page
                 html += `<td>${result[i].inventory_id}</td>`;
                 html += `<td>${result[i].gname}</td>`;
 
@@ -303,9 +354,10 @@ app.get("/new_search", function (req, res) {
 
             html += "</table>";
 
-            // Add the "Back to Main Inventory Page" link
+            // Link back to the main menu page (displays all inventory)
             html += "<p><a href=\"/menu\">Back to Main Inventory Page</a></p>";
 
+            // Adds sorting function for all arrows in each column
             html += "</body><script>";
             html += "function sortTable(column) {";
             html += "    const table = document.getElementById('inventoryTable');";
@@ -322,8 +374,8 @@ app.get("/new_search", function (req, res) {
             html += "        let aValue = a.cells[column].innerText;";
             html += "        let bValue = b.cells[column].innerText;";
 
-            // Convert values to numbers for the inventory_id column
-            html += "        if (column === 0 || column === 2) {"; // Assuming inventory_id is the first column
+            // Convert values to numbers for the inventory_id/price column
+            html += "        if (column === 0 || column === 2) {";
             html += "            aValue = parseInt(aValue);";
             html += "            bValue = parseInt(bValue);";
             html += "        } else {";
@@ -331,27 +383,29 @@ app.get("/new_search", function (req, res) {
             html += "            bValue = bValue.toLowerCase();";
             html += "        }";
 
-            html += "        if (isNaN(aValue) || isNaN(bValue)) {"; // If either value is NaN, perform string comparison
+             // If either value is NaN, perform string comparison
+             // Otherwise, perform numeric comparison
+            html += "        if (isNaN(aValue) || isNaN(bValue)) {";
             html += "            return ascending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);";
-            html += "        } else {"; // Otherwise, perform numeric comparison
+            html += "        } else {";
             html += "            return ascending ? aValue - bValue : bValue - aValue;";
             html += "        }";
             html += "    });";
-
             html += "    rows.forEach(row => table.appendChild(row));";
             html += "}";
             html += "</script></html>";
 
-            // Send the HTML string as the response
+            // Send the HTML string
             res.send(html);
         });
     } else {
-        // User is not authenticated, redirect to login or handle accordingly
+        // If the user is not authenticated, they are sent back to the login page
         res.redirect("/Staff_Login");
     }
 });
 
-
+// Unused function, cut due to time
+// Would display the information of individual game that was clicked on in the menu table
 function gameDetails(id) {
     app.get("/gameDetails", function (req, res) {
         let html = "<html><script>"
@@ -389,12 +443,21 @@ function gameDetails(id) {
     html += "</script><html>";
     res.send(html);
 }
-app.post("/Staff_Login", function (req, res) {
-    // ... (rest of your /Staff_Login route handling)
-    var username = req.body.uname.trim();   // extract the strings received from the browser
-    var password = req.body.pword.trim();   // extract the strings received from the browser
 
-    // Using a parameterized query
+
+//******************************************************************************
+//*** POST requests:
+//******************************************************************************
+
+// login page
+app.post("/Staff_Login", function (req, res) {
+
+    // Get username and password from information entered on the page
+    var username = req.body.uname.trim();
+    var password = req.body.pword.trim();
+
+    // SELECT SQL Operation
+    // Gather info that matches information entered
     var sql_query = "SELECT * " +
         "FROM login l " +
         "JOIN login_staff ls USING(username) " +
@@ -402,106 +465,67 @@ app.post("/Staff_Login", function (req, res) {
         "WHERE l.username = ? AND l.password = ?";
 
     console.log("Executing SQL query:", sql_query);
-    con.query(sql_query, [username, password], function (err, result, fields) { // execute the SQL string
+    con.query(sql_query, [username, password], function (err, result, fields) {
+        // Error tracking
         if (err) {
             console.error("Error executing SQL query:", err);
             res.status(500).send("Internal Server Error");
             return;
         } else {
+            // Valid information, get menu page, set session tracking
             if (result.length > 0) {
-                // Valid username and password
-                // Redirect to the menu page
-                req.session.user = result[0]; // Assuming result[0] contains user data
+                req.session.user = result[0];
                 res.redirect("/menu");
             } else {
-                // No matching user found
+                // Invalid information or user not found
                 readAndServe("./Staff_Login.html", res, "Invalid username or password");
             }
         }
     });
 });
 
-app.get("/addGame", function (req, res) {
-    readAndServe("./addGame.html", res)
-  });
-app.get("/updateGame", function (req, res) {
-    readAndServe("./updateGame.html", res)
-});
-app.get("/deleteGame", function (req, res) {
-    readAndServe("./deleteGame.html", res)
-});
-
-
-//******************************************************************************
-//*** receive POST register data from the client
-//******************************************************************************
-
-
-app.post("/Staff_Login", function (req, res) {
-    // ... (rest of your /Staff_Login route handling)
-    var username = req.body.uname.trim();   // extract the strings received from the browser
-    var password = req.body.pword.trim();   // extract the strings received from the browser
-
-  // Using a parameterized query
-  var sql_query = "SELECT * " +
-      "FROM login l " +
-      "JOIN login_staff ls USING(username) " +
-      "JOIN staff sta USING(staff_id) " +
-      "WHERE l.username = ? AND l.password = ?";
-
-  console.log("Executing SQL query:", sql_query);
-  con.query(sql_query, [username, password], function (err, result, fields) { // execute the SQL string
-    if (err) {
-      console.error("Error executing SQL query:", err);
-      res.status(500).send("Internal Server Error");
-      return;
-    } else {
-      if (result.length > 0) {
-        // Valid username and password
-        // Redirect to the menu page
-          req.session.user = result[0]; // Assuming result[0] contains user data
-          res.redirect("/menu");
-      } else {
-        // No matching user found
-        readAndServe("./Staff_Login.html", res, "Invalid username or password");
-      }
-    }
-  });
-  });
-
+// Add Function
 app.post("/add", function (req, res) {
+
+    // Get variables to add
     var name = req.body.name_desc.trim(); // Remove extra spaces from the name
     var pri = req.body.price_desc || null; // Make price, publisher, player_type optional
     var publ = req.body.publisher_desc || null;
     var play_type = req.body.player_type_desc || null;
     var g_id = -1;
 
-    // Ensure all required fields are filled
+    // Checking that fields are full
     if (!name) {
         return res.status(400).send("Name is required");
     }
 
-    // Get the maximum game_id from the games table
+    // SELECT SQL Operation
+    // Select the maximum ID from the games table
     const select_max_game_id = `SELECT MAX(game_id) AS max_game_id FROM games`;
 
     con.query(select_max_game_id, function (err, result, fields) {
+        // Error checking
         if (err) {
             console.error("Error executing SQL query:", err);
             return res.status(500).send("Internal Server Error");
         }
 
+        // Set max game ID and game ID variables
         const max_game_id = result[0].max_game_id || 0;
         g_id = max_game_id + 1;
 
-        // Check if the game already exists in the games table
+        // SELECT SQL Operation
+        // Check if the game already exists in the table
         const select_game = `SELECT * FROM games WHERE gname = ?`;
 
         con.query(select_game, [name], function (err, result, fields) {
+            // Error checking for SQL statement
             if (err) {
                 console.error("Error executing SQL query:", err);
                 return res.status(500).send("Internal Server Error");
             }
 
+            // Check if the game already exists, add pre-existing game info here
             if (result.length > 0) {
                 // Game already exists, use existing game_id
                 g_id = result[0].game_id;
@@ -510,7 +534,9 @@ app.post("/add", function (req, res) {
                 publ = result[0].publisher;
                 play_type = result[0].player_type;
             } else {
-                // Game does not exist, insert into games table
+                // Game does not exist, insert into the games table
+
+                // Set up for player_type variable
                 if (play_type === 'Singleplayer') {
                     play_type = 1;
                 }
@@ -533,9 +559,12 @@ app.post("/add", function (req, res) {
                     play_type = 'Multiplayer Co-op, Multiplayer Cross-Platform';
                 }
 
+                // INSERT INTO SQL Operation
+                // Inserts new game into the games table
                 const insert_game = `INSERT INTO games (gname, price, publisher, player_type) VALUES (?, ?, ?, ?)`;
 
                 con.query(insert_game, [name, pri, publ, play_type], function (err, result, fields) {
+                    // Error checking for SQL Statement
                     if (err) {
                         console.error("Error executing SQL query:", err);
                         return res.status(500).send("Internal Server Error");
@@ -543,10 +572,12 @@ app.post("/add", function (req, res) {
                 });
             }
 
-            // Insert into inventory table
+            // INSERT INTO SQL Operation
+            // Inserts new inventory item into inventory table
             const insert_inventory = `INSERT INTO inventory (game_id) VALUES (?)`;
 
             con.query(insert_inventory, [g_id], function (err, result, fields) {
+                // Error checking for SQL statement
                 if (err) {
                     console.error("Error executing SQL query:", err);
                     return res.status(500).send("Internal Server Error");
@@ -559,30 +590,39 @@ app.post("/add", function (req, res) {
     });
 });
 
+// Update Function
 app.post("/update", function (req, res) {
-    var invent_id = req.body.iid; // Remove extra spaces from the name
+    // Get inventory ID entered
+    var invent_id = req.body.iid;
 
+    // SELECT SQL Operation
     // Get the maximum game_id from the games table
     checkID  = "Select * from inventory join games using(game_id) where inventory_id = ?"
     con.query(checkID, invent_id, function (err, result, fields) {
+        // Error checking for SQL statement
         if (err) {
             console.error("Error executing SQL query:", err);
             return res.status(500).send("Internal Server Error");
         }
         if (result.length === 0) {
-            // No matching user found
+            // No inventory item found
             readAndServe("./updateGame.html", res, "Inventory ID does not exist");
         }
         else {
+            // Inventory item found
+
+            // Set up game variables
             const gid = result[0].game_id;
-            var name = result[0].gname; // Remove extra spaces from the name
+            var name = result[0].gname;
             var price = result[0].price;
             var publisher = result[0].publisher
             var player_type = result[0].player_type;
+
+            // Set up html string
             let html2 = `
                 <html>
-                    <head>
-                        <style>
+                    <head> 
+                        <style> 
                             body {
                                 font-family: Arial, sans-serif;
                                 background-color: #f4f4f4;
@@ -677,83 +717,95 @@ app.post("/update", function (req, res) {
     });
 });
 
+// Applying the update function
 app.post("/applyUpdate", function (req, res) {
-                var gid = req.body.gid; // Remove extra spaces from the name
-                var name = req.body.name;
-                var price = req.body.price;
-                var publisher = req.body.publisher;
-                var play_type = req.body.player_type;
+    // Set up variables
+    var gid = req.body.gid;
+    var name = req.body.name;
+    var price = req.body.price;
+    var publisher = req.body.publisher;
+    var play_type = req.body.player_type;
 
-                if (play_type === 'Singleplayer') {
-                    play_type = 1;
-                }
-                else if (play_type === 'Singleplayer, Multiplayer Co-op') {
-                    play_type = 2;
-                }
-                else if (play_type === 'Singleplayer, Multiplayer Co-op, Multiplayer Cross-Platform') {
-                    play_type = 3;
-                }
-                else if (play_type === 'Multiplayer Co-op') {
-                    play_type = 4;
-                }
-                else if (play_type === 'Multiplayer Cross-Platform') {
-                    play_type = 5;
-                }
-                else if (play_type === 'Singleplayer, Multiplayer Cross-Platform') {
-                    play_type = 6;
-                }
-                else if (play_type === 'Multiplayer Co-op, Multiplayer Cross-Platform') {
-                    play_type = 7;
-                }
+    // Set up player_type variable
+    if (play_type === 'Singleplayer') {
+        play_type = 1;
+    }
+    else if (play_type === 'Singleplayer, Multiplayer Co-op') {
+        play_type = 2;
+    }
+    else if (play_type === 'Singleplayer, Multiplayer Co-op, Multiplayer Cross-Platform') {
+        play_type = 3;
+    }
+    else if (play_type === 'Multiplayer Co-op') {
+        play_type = 4;
+    }
+    else if (play_type === 'Multiplayer Cross-Platform') {
+        play_type = 5;
+    }
+    else if (play_type === 'Singleplayer, Multiplayer Cross-Platform') {
+        play_type = 6;
+    }
+    else if (play_type === 'Multiplayer Co-op, Multiplayer Cross-Platform') {
+        play_type = 7;
+    }
 
-                updateQuery = "UPDATE games SET gname = ?, price = ?, publisher = ?, player_type = ? WHERE game_id = ?"
-                con.query(updateQuery, [name, price, publisher, play_type, gid], function (err, result, fields) {
-                    if (err) {
-                        console.error("Error executing SQL query:", err);
-                        return res.status(500).send("Internal Server Error");
-                    }
-                    else {
-                        res.redirect("/menu");
-                    }
-                });
-            });
+    // UPDATE SQL Operation
+    // Updates the selected game info
+    updateQuery = "UPDATE games SET gname = ?, price = ?, publisher = ?, player_type = ? WHERE game_id = ?"
+    con.query(updateQuery, [name, price, publisher, play_type, gid], function (err, result, fields) {
+        // Error checking for SQL statement
+        if (err) {
+            console.error("Error executing SQL query:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+        else {
+            // Redirect to main menu page
+            res.redirect("/menu");
+        }
+    });
+});
 
-
+// Delete function
 app.post("/delete", function (req, res) {
-    var iid = req.body.gid.trim(); // Remove extra spaces from the name
-    var confirm = req.body.Confirm
+    // Set up variables
+    var iid = req.body.gid.trim();
+    var confirm = req.body.Confirm;
     // Ensure all required fields are filled
 
+    // SELECT SQL Operation
+    // Selects the inventory id entered
+    checkID  = "Select * from inventory where inventory_id = ?";
 
-    // Get the maximum game_id from the games table
-    checkID  = "Select * from inventory where inventory_id = ?"
-    deleteGame = "DELETE FROM inventory where inventory_id = ?"
+    // DELETE SQL Operation
+    // Deletes the selected inventory id from the data
+    deleteGame = "DELETE FROM inventory where inventory_id = ?";
     con.query(checkID, iid, function (err, result, fields) {
+        // Error checking for SQL statement
         if (err) {
             console.error("Error executing SQL query:", err);
             return res.status(500).send("Internal Server Error");
         }
         if (confirm != "Yes") {
+            // Ensure check box is checked
             readAndServe("./deleteGame.html", res, "Check Box not checked");
         }
         else if (result.length == 0) {
-            // No matching user found
+            // Inventory id not found
             readAndServe("./deleteGame.html", res, "Inventory ID does not exist");
         }
         else {
             con.query(deleteGame, iid, function (err, result, fields) {
+                // Error checking for SQL statement
                 if (err) {
                     console.error("Error executing SQL query:", err);
                     return res.status(500).send("Internal Server Error");
                 }
+                // Redirect to main menu page once successful
                 else res.redirect("/menu");
             })
         }
     });
 });
-
-
-
 
 // Start the server
 app.listen(port, function () {

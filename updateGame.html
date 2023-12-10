@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Update Game</title>
+    <!-- Set up CSS -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,10 +58,12 @@
 
     <h3>Update</h3>
 
+    <!-- Set up form for update box -->
     <form name="update" action="http://localhost:3000/update" method="post">
 
         <br><br>
         Please Enter Inventory ID:<br>
+        <!-- Set up client side input check -->
         <input type="text" name="iid" value="" pattern="^\d+$" title="Please enter a numeric value without leading or trailing spaces" required> <br>
         <br>
         <div class="update-button">
@@ -69,6 +72,7 @@
     </form>
 
     <br><br>
+    <!-- Link back to main menu page for easy traversal -->
     <a href="/menu">Back to Main Menu</a>
 
 </body>

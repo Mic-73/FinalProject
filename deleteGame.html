@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <!-- Set up CSS -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -77,13 +78,14 @@
 </head>
 <body>
 
-      <h3><span class="delete">Delete</span><span class="game"> a Game</span></h3>
+    <h3><span class="delete">Delete</span><span class="game"> a Game</span></h3>
 
-
+    <!-- Set up form for delete box -->
     <form name="delete" action="http://localhost:3000/delete" method="post">
 
         <br><br>
         Please Enter Inventory ID: <br>
+        <!-- Set up client side checking for information entered -->
         <input type="text" name="gid" value="" pattern="^\d+$" title="Please enter a numeric value without leading or trailing spaces" required> <br>
 
         <br><br>
@@ -94,6 +96,7 @@
     </form>
 
     <br><br>
+    <!-- Link back to main menu page for easy traversal -->
     <a href="/menu">Back to Main Menu</a>
 
 </body>

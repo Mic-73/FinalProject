@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <!-- Set up CSS -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,10 +76,12 @@
 
   <h3><span class="add">Add</span><span class="game"> a Game</span></h3>
 
+  <!-- Set up form for add box -->
     <form name="addGame" action="/add" method="post">
 
         <br><br>
         Name:<br>
+        <!-- Set up client side checking for information entered -->
         <input type="text" name="name_desc" value="" pattern="^\S(.*\S)?$" title="Please enter a value without leading or trailing spaces" required> <br>
 
         <br><br>
@@ -100,6 +103,7 @@
     </form>
 
     <br><br>
+    <!-- Link back to main menu page for easy traversal -->
     <a href="/menu">Back to Main Menu</a>
 </body>
 </html>
